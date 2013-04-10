@@ -1,0 +1,160 @@
+/* Body */
+body{
+    margin: auto;
+    width: 1000px;
+}
+
+/* Buttons */
+.btn{
+    padding: 4px 12px;
+    font-size: 14px;
+    line-height: 20px;
+    cursor: pointer;
+    color: #ffffff;
+    background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
+    background-image: linear-gradient(to bottom, #0088cc, #0044cc);
+    background-repeat: repeat-x;
+    border: 1px solid #bbbbbb;
+    border-color: #0044cc #0044cc #002a80;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.btn:hover{
+    color: #ffffff;
+    background-color: #0044cc;
+    background-position: 0 -15px;
+    transition: background-position 0.1s linear;
+}
+
+.btn:active {
+    background-image: none;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
+}
+
+/* Options */
+#options{
+    display: inline-block;
+    vertical-align: top;
+    background-color: #87A1C0;
+    border-radius: 5px;
+    border: 1px #76808C solid;
+    padding: 12px 20px;
+    margin: 15px;
+}
+
+#options div{
+    text-align: center;
+}
+
+/* Board */
+#drag{
+    display: inline-block;
+    margin-top: 15px;
+    padding: 5px;
+    background-color: #87A1C0;
+    border-radius: 5px;
+    border: 1px #76808C solid;
+}
+
+#board{
+    margin: auto;
+    padding-top: 5px;
+    border: 15px #CE5C00 solid;
+    border-collapse: collapse;
+}
+
+#board td{
+    width: 65px;
+    height: 65px;
+    padding: 5px;
+}
+
+#board td.one{
+    background: white;
+}
+
+#board td.two{
+    background: #CCC;
+}
+
+#board td.allow_drop{   
+    box-shadow: inset 0 0 50px #248F40;
+}
+
+/* Pieces */
+#board div.piece{
+    width: 55px;
+    height: 55px;
+    background-size: 55px 55px;
+}
+
+#board div.drag{
+    width: 55px;
+    height: 55px;
+    cursor: move;
+    border: 0;
+    margin: auto;
+}
+
+/* White pieces */
+#board div.white_king{
+    background-image: url(../img/white_king.png);
+}
+
+#board div.white_queen{
+    background-image: url(../img/white_queen.png);
+}
+
+#board div.white_bishop{
+    background-image: url(../img/white_bishop.png);
+}
+
+#board div.white_knight{
+    background-image: url(../img/white_knight.png);
+}
+
+#board div.white_rook{
+    background-image: url(../img/white_rook.png);
+}
+
+#board div.white_pawn{
+    background-image: url(../img/white_pawn.png);
+}
+
+/* Black Pieces */
+#board div.black_king{
+    background-image: url(../img/black_king.png);
+}
+
+#board div.black_queen{
+    background-image: url(../img/black_queen.png);
+}
+
+#board div.black_bishop{
+    background-image: url(../img/black_bishop.png);
+}
+
+#board div.black_knight{
+    background-image: url(../img/black_knight.png);
+}
+
+#board div.black_rook{
+    background-image: url(../img/black_rook.png);
+}
+
+#board div.black_pawn{
+    background-image: url(../img/black_pawn.png);
+}
+
+/* History */
+#history{
+    display: none;
+    vertical-align: top;
+    background-color: #87A1C0;
+    border-radius: 5px;
+    border: 1px #76808C solid;
+    padding: 12px 20px;
+    margin: 15px;
+}
