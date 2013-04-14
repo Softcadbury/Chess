@@ -11,10 +11,16 @@ window.Game = Backbone.Model.extend({
 		history: null
 	},
 
-	// Constructor which initializes the board and print it
+	// Constructor which prints the board & initializes the history for undo actions
 	initialize: function Game() {
 		this.print();
-		this.initHistory();
+
+		var self = this;
+		$('#undo').click(function() {
+			if(!$('#undo').hasClass('disabled') && self.get('history') != null)
+				self.undoLastMove();
+		});
+
 		document.onselectstart = function(){ return false; };
 	},
 
@@ -27,7 +33,6 @@ window.Game = Backbone.Model.extend({
 	// Start the game with two players
 	startTwoPlayersGame: function () {
 		this.resetGame();
-		this.set({ 'current_player_color': White });
 		this.initRedips();
 		this.preventBadDrags();
 		alertify.success('New game started');
@@ -36,7 +41,7 @@ window.Game = Backbone.Model.extend({
 	// Reset the game
 	resetGame: function () {
 		this.set({ 'board': new Board() });
-		this.set({ 'current_player_color': null });
+		this.set({ 'current_player_color': White });
 		this.set({ 'ai': null });
 		this.initBoard();
 		this.print();
@@ -47,24 +52,29 @@ window.Game = Backbone.Model.extend({
 		var content = "";
 
 		for (var index = 0; index < 64; index++) {
-			if (this.get('board') != null)
-				var piece = this.get('board').getPiece(index % 8, Math.floor(index / 8));
-
+			// <tr>
 			if (index % 8 == 0) content += '<tr>';
 
-			if (((Math.floor(index / 8)) * 1 + index) % 2 == 0) content += '<td class="one" id="td' + index + '">';
-			else content += '<td class="two" id="td' + index + '">';
+			// <td>
+			var td_class = (((Math.floor(index / 8)) + index) % 2 == 0) ? 'one' : 'two';
+			content += '<td class="' + td_class + '" id="td' + index + '">';
 
-			if (this.get('board') != null && piece.get('type') != 'empty')
-				content += '<div class="drag" id="div' + index + '"><div class="piece ' + piece.toString() + '" /></div>';
+			// <td> content
+			if (this.get('board') != null)
+			{
+				var piece = this.get('board').getPiece(index % 8, Math.floor(index / 8));
+				if (piece.get('type') != 'empty')
+					content += '<div class="drag" id="div' + index + '"><div class="piece ' + piece.toString() + '" /></div>';
+			}
 
+			// </td>
 			content += '</td>';
 
+			// </tr>
 			if ((index + 1) % 8 == 0) content += '</tr>';
 		};
 
 		$('#board').html(content);
-		this.preventAllDrags();
 	},
 
 	// Init the board
@@ -90,45 +100,46 @@ window.Game = Backbone.Model.extend({
 		this.get('board').add(new Rook({ color : White}));
 	},
 
-	// Init history
-	initHistory: function () {
-		var thisObj = this;
-		$('#undo').click(function() {
-			if(thisObj.get('history') != null)
-				thisObj.undoLastMove();
-		});
-	},
-
-	// Enable undo action
+	// Enable undo actions
 	enableUndo: function () {
 		this.set({ 'history': new History() });
 		$('#history').css('display', 'inline-block');
 	},
 
-	// Disable undo action
+	// Disable undo actions
 	disableUndo: function () {
 		this.set({ 'history': null });
 		$('#history').hide();
 	},
 
-	// Undo the last movement of the player. The ia doesn't count as a player
+	// Undo the last movement of the player. If there is an ia, its last move is undo too
 	undoLastMove: function () {
+		$('#undo').addClass('disabled');
 		this.get('history').undoLastMove(this);
 
 		if (this.get('ai') != null) {
-			var thisObj = this;
+			var self = this;
+
 			setTimeout(function() {
-				thisObj.get('history').undoLastMove(thisObj);
+				self.get('history').undoLastMove(self);
 			}, 600);
+
+			setTimeout(function() {
+				$('#undo').removeClass('disabled');
+			}, 1200);
 		}
 		else {
 			this.changePlayer();
+
+			setTimeout(function() {
+				$('#undo').removeClass('disabled');
+			}, 600);
 		}
 	},
 
-	// Init options if redips
+	// Init options of redips
 	initRedips: function () {
-		var thisObj = this,
+		var self = this,
 			rd = REDIPS.drag;
 
 		rd.init();
@@ -138,7 +149,7 @@ window.Game = Backbone.Model.extend({
 		// Prevent bad drops when a piece is clicked
 		rd.event.clicked = function () {
 			var pos = rd.getPosition();
-			thisObj.preventBadDrops(pos[2], pos[1]);
+			self.preventBadDrops(pos[2], pos[1]);
 		};
 
 		// Remove the mark class when the mouse is up
@@ -150,14 +161,24 @@ window.Game = Backbone.Model.extend({
 		// Init the next turn when a piece is dropped
 		rd.event.dropped = function () {
 			var pos = rd.getPosition();
+
+			// Check if the start position is different from the final position
 			if (pos[1] != pos[4] || pos[2] != pos[5]) {
-				if (thisObj.get('ai') != null) thisObj.nextTurnOnePlayer(pos[5], pos[4], pos[2], pos[1]);
-				else thisObj.nextTurnTwoPlayers(pos[5], pos[4], pos[2], pos[1]);
+				if (self.get('ai') != null)
+					self.nextTurnOnePlayer(pos[5], pos[4], pos[2], pos[1]);
+				else
+					self.nextTurnTwoPlayers(pos[5], pos[4], pos[2], pos[1]);
 			}
 		};
 	},
 
-	// Allow to drag only pieces of the current player
+	// Prevent drags of all pieces
+	preventAllDrags: function () {
+		$('#board div').addClass('prevent_drag');
+		REDIPS.drag.enableDrag(false, '.prevent_drag');
+	},
+
+	// Prevent drags of pieces not belonging to the current player
 	preventBadDrags: function () {
 		REDIPS.drag.enableDrag(true, '.prevent_drag');
 		$('#board div').removeClass('prevent_drag');
@@ -170,13 +191,7 @@ window.Game = Backbone.Model.extend({
 		REDIPS.drag.enableDrag(false, '.prevent_drag');
 	},
 
-	// Prevent all drags of pieces
-	preventAllDrags: function () {
-		$('#board div').addClass('prevent_drag');
-		REDIPS.drag.enableDrag(false, '.prevent_drag');
-	},
-
-	// Allow to drop pieces only in correct places
+	// Prevent drops of pieces on incorrect places
 	preventBadDrops: function (fromX, fromY) {
 		var piece = this.get('board').getPiece(fromX, fromY);
 		for (var toPos = 0; toPos < 64; toPos++) {
@@ -195,11 +210,11 @@ window.Game = Backbone.Model.extend({
 	},
 
 	// Move the piece on the board array and change its id
-	makeBoardMove: function (fromX, fromY, toX, toY, save) {
+	makeBoardMove: function (fromX, fromY, toX, toY, saveInHistory) {
 		var pieceMoved = this.get('board').makeMove(fromX, fromY, toX, toY);
 		$('#div' + (fromX + fromY * 8)).attr('id', 'div' + (toX + toY * 8));
 
-		if(this.get('history') != null && save)
+		if(this.get('history') != null && saveInHistory)
 			this.get('history').saveLastMove(fromX, fromY, toX, toY, pieceMoved);
 	},
 
@@ -212,18 +227,19 @@ window.Game = Backbone.Model.extend({
 		});
 	},
 
-	// Init the next turn of the game when there is two players
+	// Init the next turn of the game when there are two players
 	nextTurnTwoPlayers: function (fromX, fromY, toX, toY) {
 		this.changePlayer();
 		this.preventBadDrags();
 		this.makeBoardMove(fromX, fromY, toX, toY, true);
 	},
 
-	// Init the next turn of the game for the alone player
+	// Init the next turn of the game when there is one player
 	nextTurnOnePlayer: function (fromX, fromY, toX, toY) {
-		this.preventAllDrags();
 		this.changePlayer();
-		this.makeBoardMove(fromX, fromY, toX, toY, true);	
+		this.preventAllDrags();
+		this.makeBoardMove(fromX, fromY, toX, toY, true);
+
 		var bestMove = this.get('ai').returnBestMove(this.get('board'), this.get('current_player_color'));
 		this.nextTurnAI(bestMove.get('fromX'), bestMove.get('fromY'), bestMove.get('toX'), bestMove.get('toY'));
 	},
@@ -240,7 +256,8 @@ window.Game = Backbone.Model.extend({
 	isGameCkeck: function () {
 		//if ()
 		{
-			alertify.success('Black player\'s king is in check');
+			var color = this.get('current_player_color');
+			alertify.success(color + ' player\'s king is in check');
 		}
 	},
 
@@ -249,7 +266,8 @@ window.Game = Backbone.Model.extend({
 		//if ()
 		{
 			this.preventAllDrags();
-			alertify.success('Black player\'s king is in checkmate');
+			var color = this.get('current_player_color');
+			alertify.success(color + ' player\'s king is in checkmate');
 		}
 	}
 });

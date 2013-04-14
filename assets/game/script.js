@@ -4,16 +4,13 @@
 /* Constants */
 /********************************************/
 var Black = 'black',
-	White = 'white';
+    White = 'white';
 
 /********************************************/
 /* Init */
 /********************************************/
 $(document).ready(function () {
 	var game = new Game();
-	//game.startOnePlayerGame();
-	//game.enableUndo()
-
 	$('#new-game').click(function() {
 		// Select the type of game, one or two players
 		if ($('input:radio[name=playerMode]:checked').val() == 'one')

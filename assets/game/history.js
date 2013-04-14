@@ -1,3 +1,5 @@
+"use strict";
+
 /********************************************/
 /* Model MoveInfo */
 /********************************************/
@@ -22,7 +24,7 @@ window.History = Backbone.Collection.extend({
 	},
 
 	undoLastMove: function (game) {
-		if (this.length < 1)
+		if (this.length == 0)
 			return;
 
 		var moveInfo = this.pop();
@@ -30,13 +32,13 @@ window.History = Backbone.Collection.extend({
 		game.makeRedipsMove(moveInfo.get('toX'), moveInfo.get('toY'), moveInfo.get('fromX'), moveInfo.get('fromY'));
 		game.makeBoardMove(moveInfo.get('toX'), moveInfo.get('toY'), moveInfo.get('fromX'), moveInfo.get('fromY'), false);
 
-		var pieceMoved = moveInfo.get('pieceMoved').toString(),
-			indexPieceMoved = moveInfo.get('toX') + moveInfo.get('toY') * 8;
+		var pieceMoved = moveInfo.get('pieceMoved').toString();
 
 		if (pieceMoved != '') {
 			game.get('board').setPiece(moveInfo.get('toX'), moveInfo.get('toY'), moveInfo.get('pieceMoved'));
+			var indexPieceMoved = moveInfo.get('toX') + moveInfo.get('toY') * 8;
 			setTimeout(function() {
-				$('#td' + indexPieceMoved).html('<div class="drag" id="div' + indexPieceMoved +
+				$('#td' + indexPieceMoved).html('<div class="drag" id="div' + indexPieceMoved + 
 												'"><div class="piece ' + pieceMoved + '" /></div>');
 				game.initRedips();
 			}, 200);
