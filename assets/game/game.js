@@ -8,7 +8,8 @@ window.Game = Backbone.Model.extend({
 		board: null,
 		current_player_color: null,
 		ai: null,
-		history: null
+		history: null,
+		game_over: false
 	},
 
 	// Constructor which prints the board & initializes the history for undo actions
@@ -43,6 +44,7 @@ window.Game = Backbone.Model.extend({
 		this.set({ 'board': new Board() });
 		this.set({ 'current_player_color': White });
 		this.set({ 'ai': null });
+		this.set({ 'game_over': false });
 		this.initBoard();
 		this.print();
 	},
@@ -87,9 +89,9 @@ window.Game = Backbone.Model.extend({
 		this.get('board').add(new Bishop({ color : Black}));
 		this.get('board').add(new Knight({ color : Black}));
 		this.get('board').add(new Rook({ color : Black}));
-		for (var i = 0; i < 8; ++i) this.get('board').add(new Pawn({ color : Black}));
-		for (var i = 0; i < 8 * 4; ++i) this.get('board').add(new Empty());
-		for (var i = 0; i < 8; ++i) this.get('board').add(new Pawn({ color : White}));
+		//for (var i = 0; i < 8; ++i) this.get('board').add(new Pawn({ color : Black}));
+		for (var i = 0; i < 8 * 6; ++i) this.get('board').add(new Empty());
+		//for (var i = 0; i < 8; ++i) this.get('board').add(new Pawn({ color : White}));
 		this.get('board').add(new Rook({ color : White}));
 		this.get('board').add(new Knight({ color : White}));
 		this.get('board').add(new Bishop({ color : White}));
@@ -216,6 +218,8 @@ window.Game = Backbone.Model.extend({
 
 		if(this.get('history') != null && saveInHistory)
 			this.get('history').saveLastMove(fromX, fromY, toX, toY, pieceMoved);
+
+		return pieceMoved;
 	},
 
 	// Move the piece on the board with an animation
@@ -231,14 +235,18 @@ window.Game = Backbone.Model.extend({
 	nextTurnTwoPlayers: function (fromX, fromY, toX, toY) {
 		this.changePlayer();
 		this.preventBadDrags();
-		this.makeBoardMove(fromX, fromY, toX, toY, true);
+
+		var piece = this.makeBoardMove(fromX, fromY, toX, toY, true);
+		this.checkGameOver(piece);
 	},
 
 	// Init the next turn of the game when there is one player
 	nextTurnOnePlayer: function (fromX, fromY, toX, toY) {
 		this.changePlayer();
 		this.preventAllDrags();
-		this.makeBoardMove(fromX, fromY, toX, toY, true);
+		
+		var piece = this.makeBoardMove(fromX, fromY, toX, toY, true);
+		this.checkGameOver(piece);
 
 		var bestMove = this.get('ai').returnBestMove(this.get('board'), this.get('current_player_color'));
 		this.nextTurnAI(bestMove.get('fromX'), bestMove.get('fromY'), bestMove.get('toX'), bestMove.get('toY'));
@@ -246,28 +254,25 @@ window.Game = Backbone.Model.extend({
 
 	// Init the next turn of the game for the ai
 	nextTurnAI: function (fromX, fromY, toX, toY) {
+		if (this.get('game_over') == true)
+			return;
+
 		this.changePlayer();
 		this.preventBadDrags();
 		this.makeRedipsMove(fromX, fromY, toX, toY);
-		this.makeBoardMove(fromX, fromY, toX, toY, true);
+		
+		var piece = this.makeBoardMove(fromX, fromY, toX, toY, true);
+		this.checkGameOver(piece);
 	},
 
-	// Check if the game is check
-	isGameCkeck: function () {
-		//if ()
+	// Check if the game is over
+	checkGameOver: function (takenPiece) {
+		if (takenPiece.toString() == 'black_king' || takenPiece.toString() == 'white_king')
 		{
-			var color = this.get('current_player_color');
-			alertify.success(color + ' player\'s king is in check');
-		}
-	},
-
-	// Check if the game is checkmate (Game over)
-	isGameCheckmate: function () {
-		//if ()
-		{
+			var color = this.get('current_player_color') == White ? Black : White;
+			alertify.success('The ' + color + ' player won the game');
+			this.set({ 'game_over': true });
 			this.preventAllDrags();
-			var color = this.get('current_player_color');
-			alertify.success(color + ' player\'s king is in checkmate');
 		}
 	}
 });

@@ -6,8 +6,8 @@
 window.AI = Backbone.Model.extend({
 	// Return the best move
 	returnBestMove: function (board, current_player_color) {
-		var thisObj = this,
-			min = -1000000000,
+		var self = this,
+			min = -1000000,
 			bestMove;
 
 		board.getPossibleMoves(current_player_color).each(function (move1) {
@@ -16,7 +16,7 @@ window.AI = Backbone.Model.extend({
 
 			board.getPossibleMoves(color2).each(function (move2) {
 				var pieceTmp2 = board.makeMove(move2.get('fromX'), move2.get('fromY'), move2.get('toX'), move2.get('toY')),
-					score = thisObj.evalBoardScore(board, current_player_color);
+					score = self.evalBoardScore(board, current_player_color);
 
 				if (score > min) {
 					min = score;
@@ -34,8 +34,8 @@ window.AI = Backbone.Model.extend({
 
 	// Eval the score of the board
 	evalBoardScore: function (board, current_player_color) {
-		var res = 0;
-		var thisObj = this;
+		var res = 0,
+			self = this;
 
 		board.each(function (piece, index) {
 			if (piece.get('type') != 'empty') {
@@ -44,15 +44,15 @@ window.AI = Backbone.Model.extend({
 					scoreType = 0,
 					scorePosition = 0;
 
-				scoreType = thisObj.getScoreType(piece);
+				scoreType = self.getScoreType(piece);
 
 				if (piece.get('type') == 'pawn') {
-					scorePosition = thisObj.getScorePositionVertical(x);
-					scorePosition += thisObj.getScorePositionHorizontal(y);
+					scorePosition = self.getScorePositionVertical(x);
+					scorePosition += self.getScorePositionHorizontal(y);
 				}
 				else {
-					scorePosition = thisObj.getScorePawnPositionVertical(x);
-					scorePosition += thisObj.getScorePawnPositionHorizontal(piece.get('color'), y);
+					scorePosition = self.getScorePawnPositionVertical(x);
+					scorePosition += self.getScorePawnPositionHorizontal(piece.get('color'), y);
 				}
 
 				if (piece.get('color') == current_player_color) res += scoreType + scorePosition;

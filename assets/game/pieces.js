@@ -23,19 +23,6 @@ window.Piece = Backbone.Model.extend({
 		return true;
 	},
 
-	isCheckmate : function (board, color, fromX, fromY, toX, toY) {
-		var pieceTmp = board.makeMove(fromX, fromY, toX, toY),
-			color2 = color == White ? Black : White;
-
-		board.getPossibleMoves(color2).each(function (move) {
-			if (board.getPiece(move.get('toX'), move.get('toY')).get('type') == 'king') return true;
-		});
-
-		board.undoMove(fromX, fromY, toX, toY, pieceTmp);
-
-		return false;
-	},
-
 	// Return true if the move is horizontal
 	moveIsVerticalOrHorizontal: function (board, fromX, fromY, toX, toY) {
 		var is_move_on_x = (fromX - toX) != 0,
@@ -150,9 +137,6 @@ window.King = Piece.extend({
 			val_move_on_y = Math.abs(fromY - toY);
 		if (val_move_on_x > 1 || val_move_on_y > 1) return false;
 
-		// Check if the move doesn't endanger the king
-		//if (this.isCheckmate(board, color, fromX, fromY, toX, toY)) return false;
-
 		return true;
 	}
 });
@@ -183,9 +167,6 @@ window.Queen = Piece.extend({
 		// Error if there is a collision
 		if (this.checkCollision(board, fromX, fromY, toX, toY)) return false;
 
-		// Check if the move doesn't endanger the king
-		//if (this.isCheckmate(board, color, fromX, fromY, toX, toY)) return false;
-
 		return true;
 	}
 });
@@ -214,9 +195,6 @@ window.Bishop = Piece.extend({
 
 		// Error if there is a collision
 		if (this.checkCollision(board, fromX, fromY, toX, toY)) return false;
-
-		// Check if the move doesn't endanger the king
-		//if (this.isCheckmate(board, color, fromX, fromY, toX, toY)) return false;
 
 		return true;
 	}
@@ -247,9 +225,6 @@ window.Knight = Piece.extend({
 		if ((val_move_on_x != 2 || val_move_on_y != 1) &&
 			(val_move_on_x != 1 || val_move_on_y != 2)) return false;
 
-		// Check if the move doesn't endanger the king
-		//if (this.isCheckmate(board, color, fromX, fromY, toX, toY)) return false;
-
 		return true;
 	}
 });
@@ -278,9 +253,6 @@ window.Rook = Piece.extend({
 
 		// Error if there is a collision
 		if (this.checkCollision(board, fromX, fromY, toX, toY)) return false;
-
-		// Check if the move doesn't endanger the king
-		//if (this.isCheckmate(board, color, fromX, fromY, toX, toY)) return false;
 
 		return true;
 	}
@@ -328,9 +300,6 @@ window.Pawn = Piece.extend({
 		// Error if the end position is not empty.
 		if (board.getPiece(toX, toY).get('type') != 'empty') return false;
 
-		// Check if the move doesn't endanger the king
-		//if (this.isCheckmate(board, color, fromX, fromY, toX, toY)) return false;
-
 		return true;
 	},
 
@@ -343,9 +312,6 @@ window.Pawn = Piece.extend({
 
 		// Error if the end position is empty.
 		if (board.getPiece(toX, toY).get('type') == 'empty') return false;
-
-		// Check if the move doesn't endanger the king
-		//if (this.isCheckmate(board, color, fromX, fromY, toX, toY)) return false;
 
 		return true;
 	}
@@ -400,13 +366,13 @@ window.Board = Backbone.Collection.extend({
 
 	// Return a list of possible move
 	getPossibleMoves: function (current_player_color) {
-		var thisObj = this,
+		var self = this,
 			possibleMoves = new Moves();
 
 		this.each(function (piece, index) {
 			if (piece.get('color') == current_player_color) {
 				for (var toPos = 0; toPos < 64; toPos++) {
-					if (index != toPos && piece.moveIsCorrect(thisObj, current_player_color,
+					if (index != toPos && piece.moveIsCorrect(self, current_player_color,
 						index % 8, Math.floor(index / 8), toPos % 8, Math.floor(toPos / 8))) {
 						possibleMoves.add(new Move({
 							fromX: index % 8,
