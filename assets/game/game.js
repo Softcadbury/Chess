@@ -89,9 +89,9 @@ window.Game = Backbone.Model.extend({
 		this.get('board').add(new Bishop({ color : Black}));
 		this.get('board').add(new Knight({ color : Black}));
 		this.get('board').add(new Rook({ color : Black}));
-		//for (var i = 0; i < 8; ++i) this.get('board').add(new Pawn({ color : Black}));
+		for (var i = 0; i < 8; ++i) this.get('board').add(new Pawn({ color : Black}));
 		for (var i = 0; i < 8 * 6; ++i) this.get('board').add(new Empty());
-		//for (var i = 0; i < 8; ++i) this.get('board').add(new Pawn({ color : White}));
+		for (var i = 0; i < 8; ++i) this.get('board').add(new Pawn({ color : White}));
 		this.get('board').add(new Rook({ color : White}));
 		this.get('board').add(new Knight({ color : White}));
 		this.get('board').add(new Bishop({ color : White}));
