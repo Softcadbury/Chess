@@ -4,7 +4,7 @@ body{
     width: 1000px;
 }
 
-/* Buttons */
+/* Buttons (From bootstrap) */
 .btn{
     padding: 4px 12px;
     font-size: 14px;
