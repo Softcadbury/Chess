@@ -18,7 +18,7 @@ $(document).ready(function () {
 		else if ($('input:radio[name=playerMode]:checked').val() == 'two')
 			game.startTwoPlayersGame();
 
-		// Allow or not undo functionality
+		// Allow or not the undo functionality
 		if ($('input:checkbox[name=history]:checked').val() == 'allow')			
 			game.enableUndo();
 		else			
