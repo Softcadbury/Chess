@@ -2,7 +2,7 @@
 
 ## Description
 
-This project is a chess game using the JavaScript library Backbone. I'm not a JavaScript expert, so feel free to give me your feedbacks!
+This project is a chess game using the JavaScript library Backbone.
 You can try it here : http://romain.parage.free.fr/chess/
 
 ## Frameworks
@@ -26,5 +26,5 @@ You can try it here : http://romain.parage.free.fr/chess/
  ## Todo
 
 - Implementation of some rules: Castling, Promotion, Prevent moves which put your king in danger.
-- Better ia
-- Why not an online mode!!!
+- Better ia.
+- Online mode.
