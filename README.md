@@ -23,7 +23,7 @@ You can try it here : http://romain.parage.free.fr/chess/
  - Allowing to run unobtrusive notification messages.
  - http://fabien-d.github.com/alertify.js/
 
- ## Todo
+## Todo
 
 - Implementation of some rules: Castling, Promotion, Prevent moves which put your king in danger.
 - Better ia.
