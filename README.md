@@ -1,9 +1,8 @@
-# Chess
+# Chess - <a href="http://romain.parage.free.fr/chess/">Try it !</a>
 
 ## Description
 
 This project is a chess game using the JavaScript library Backbone.
-You can try it here : http://romain.parage.free.fr/chess/
 
 ## Frameworks
 
