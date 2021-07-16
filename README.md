@@ -2,7 +2,7 @@
 
 ## Description
 
-This project is a chess game using the JavaScript library Backbone.
+This project is a chess game using the JavaScript library Backbone.JS.
 
 ## Screenshot
 
